@@ -1,0 +1,124 @@
+semantic_models:
+  - name: orders
+    description: Order fact table from jaffle shop
+    model: ref('orders')
+
+    config:
+      meta:
+        hex:
+          table: main.orders
+
+    defaults:
+      agg_time_dimension: ordered_at
+
+    meta:
+      segments:
+        - name: food_orders
+          sql: "is_food_order = true"
+        - name: drink_orders
+          sql: "is_drink_order = true"
+        - name: first_orders
+          sql: "customer_order_number = 1"
+
+    entities:
+      - name: order
+        type: primary
+        expr: order_id
+      - name: customers
+        type: foreign
+        expr: customer_id
+      - name: locations
+        type: foreign
+        expr: location_id
+
+    dimensions:
+      - name: ordered_at
+        type: time
+        expr: ordered_at
+        type_params:
+          time_granularity: day
+      - name: is_food_order
+        type: categorical
+        expr: is_food_order
+      - name: is_drink_order
+        type: categorical
+        expr: is_drink_order
+      - name: customer_order_number
+        type: categorical
+        expr: customer_order_number
+
+    measures:
+      - name: order_total
+        agg: sum
+        expr: order_total
+        description: Total order amount including tax
+      - name: subtotal
+        agg: sum
+        expr: subtotal
+      - name: tax_paid
+        agg: sum
+        expr: tax_paid
+      - name: order_cost
+        agg: sum
+        expr: order_cost
+      - name: order_count
+        agg: count
+        description: Count of orders
+      - name: food_order_count
+        agg: count
+        meta:
+          filters:
+            - "is_food_order = true"
+      - name: drink_order_count
+        agg: count
+        meta:
+          filters:
+            - "is_drink_order = true"
+      - name: new_customer_order_count
+        agg: count
+        meta:
+          filters:
+            - "customer_order_number = 1"
+      - name: avg_order_total
+        agg: average
+        expr: order_total
+
+metrics:
+  - name: average_order_value
+    description: Average revenue per order
+    type: ratio
+    type_params:
+      numerator: order_items.revenue
+      denominator: orders.order_count
+
+  - name: gross_profit
+    description: Revenue minus supply cost
+    type: derived
+    type_params:
+      expr: "order_items.revenue - order_items.supply_cost"
+
+  - name: food_revenue_pct
+    description: Percentage of revenue from food items
+    type: ratio
+    type_params:
+      numerator: order_items.food_revenue
+      denominator: order_items.revenue
+
+  - name: drink_revenue_pct
+    description: Percentage of revenue from drink items
+    type: ratio
+    type_params:
+      numerator: order_items.drink_revenue
+      denominator: order_items.revenue
+
+  - name: profit_margin
+    description: Gross profit as a percentage of revenue
+    type: derived
+    type_params:
+      expr: "(order_items.revenue - order_items.supply_cost) / NULLIF(order_items.revenue, 0)"
+
+  - name: cumulative_revenue
+    description: Running total of all revenue
+    type: cumulative
+    type_params:
+      measure: order_items.revenue

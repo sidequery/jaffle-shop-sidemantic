@@ -1,0 +1,10 @@
+source: locations is duckdb.table('main.locations') extend {
+  primary_key: location_id
+
+  dimension: location_id is location_id
+  dimension: location_name is location_name
+  dimension: tax_rate is tax_rate
+
+  measure: avg_tax_rate is tax_rate.avg()
+  measure: location_count is count()
+}

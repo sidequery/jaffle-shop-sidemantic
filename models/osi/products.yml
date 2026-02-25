@@ -1,0 +1,39 @@
+semantic_model:
+  - name: jaffle_shop_products
+    description: Product dimension table
+    datasets:
+      - name: products
+        source: main.products
+        primary_key:
+          - product_id
+        fields:
+          - name: product_name
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: product_name
+          - name: product_type
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: product_type
+          - name: product_description
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: product_description
+          - name: is_food_item
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: is_food_item
+          - name: is_drink_item
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: is_drink_item
+          - name: product_price
+            expression:
+              dialects:
+                - dialect: ANSI_SQL
+                  expression: product_price
