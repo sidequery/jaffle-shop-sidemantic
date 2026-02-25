@@ -14,25 +14,6 @@ A multi-format semantic layer built on top of the [dbt jaffle shop](https://gith
 | locations | Malloy | `models/malloy/locations.malloy` |
 | products | OSI | `models/osi/products.yml` |
 
-## Setup
-
-```bash
-# Clone with submodule
-git clone --recursive <this-repo>
-
-# Install sidemantic with LookML support
-uv tool install "sidemantic[lookml]"
-
-# Install dbt and build data
-uv tool install dbt-core
-uv pip install --python $(which dbt) dbt-duckdb
-cd jaffle-shop
-dbt deps && dbt seed && dbt build --profiles-dir .
-cd ..
-```
-
-This creates `jaffle_shop.duckdb` with 13 tables: 6 mart models (orders, order_items, customers, products, locations, supplies), 6 raw seed tables, and a metricflow time spine.
-
 ## Data overview
 
 | Table | Rows | Description |
@@ -106,13 +87,23 @@ FROM order_items"
 
 `yardstick_queries.sql` contains 9 example queries covering product revenue splits, food vs drink breakdowns, gross profit margins, order type analysis, customer segmentation, location performance, monthly revenue trends, new customer acquisition rates, and food/drink order mix over time.
 
-## Demo notebook
+## Quick start
 
 ```bash
-juv run demo.ipynb
+# Clone with submodule
+git clone --recursive <this-repo>
+cd jaffle-shop-sidemantic
+
+# Build the database (no dbt required)
+uv run setup.py
+
+# Run the demo
+juv run demo.ipynb    # Jupyter notebook
+# or
+juv run demo.py       # percent-format script
 ```
 
-Requires [juv](https://github.com/manzt/juv). Dependencies (sidemantic, polars, pyarrow) are declared inline via PEP 723 and installed automatically.
+`setup.py` reads the seed CSVs from the jaffle-shop submodule and builds `jaffle_shop.duckdb` with pure DuckDB SQL (no dbt needed). The demos auto-run it if the database doesn't exist.
 
 ## Project structure
 
@@ -125,8 +116,10 @@ Requires [juv](https://github.com/manzt/juv). Dependencies (sidemantic, polars, 
 │   ├── lookml/customers.lkml       # LookML: customers
 │   ├── malloy/locations.malloy     # Malloy: locations
 │   └── osi/products.yml            # OSI: products (dimension-only)
+├── setup.py                        # Build DuckDB from seed CSVs
 ├── sidemantic.yaml                 # Config (connection + model path)
 ├── yardstick_queries.sql           # SEMANTIC SELECT examples
 ├── demo.ipynb                      # Jupyter notebook demo
+├── demo.py                         # Percent-format script demo
 └── jaffle_shop.duckdb              # DuckDB database (generated)
 ```
