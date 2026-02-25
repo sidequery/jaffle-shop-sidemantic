@@ -64,7 +64,7 @@ sidemantic query --dry-run \
 
 ## Yardstick SQL
 
-Sidemantic has built-in support for Julian Hyde's [Measures in SQL](https://arxiv.org/abs/2307.15107) syntax. `SEMANTIC SELECT` / `AGGREGATE()` / `AT` modifiers enable context-aware aggregation directly against the model definitions, regardless of which format they were loaded from. Sidemantic's query rewriter translates these into standard SQL.
+Sidemantic has built-in support for Julian Hyde's [Measures in SQL](https://arxiv.org/abs/2406.00251v1) syntax. `SEMANTIC SELECT` / `AGGREGATE()` / `AT` modifiers enable context-aware aggregation directly against the model definitions, regardless of which format they were loaded from. Sidemantic's query rewriter translates these into standard SQL.
 
 ```bash
 # Revenue by product with percent of total
