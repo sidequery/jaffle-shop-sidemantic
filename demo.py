@@ -21,12 +21,27 @@
 # | locations | Malloy | `models/malloy/locations.malloy` |
 # | products | OSI | `models/osi/products.yml` |
 
+# %% [markdown]
+# ## Setup
+#
+# Build `jaffle_shop.duckdb` from the seed CSVs if it doesn't exist yet.
+
 # %%
+import subprocess
 from pathlib import Path
+
+db_path = Path("jaffle_shop.duckdb")
+if not db_path.exists():
+    print("Building jaffle_shop.duckdb from seed CSVs...")
+    subprocess.run(["uv", "run", "setup.py"], check=True)
+else:
+    print(f"Using existing {db_path}")
+
+# %%
 from sidemantic import SemanticLayer, load_from_directory
 import polars as pl
 
-db_path = Path("jaffle_shop.duckdb").resolve()
+db_path = db_path.resolve()
 layer = SemanticLayer(connection=f"duckdb:///{db_path}")
 load_from_directory(layer, "models/")
 
