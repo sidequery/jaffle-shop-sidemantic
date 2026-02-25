@@ -1,0 +1,51 @@
+cubes:
+  - name: order_items
+    sql_table: main.order_items
+    dimensions:
+      - name: order_item_id
+        sql: order_item_id
+        type: string
+        primary_key: true
+      - name: order_id
+        sql: order_id
+        type: string
+      - name: product_id
+        sql: product_id
+        type: string
+      - name: ordered_at
+        sql: ordered_at
+        type: time
+      - name: product_name
+        sql: product_name
+        type: string
+      - name: is_food_item
+        sql: is_food_item
+        type: boolean
+      - name: is_drink_item
+        sql: is_drink_item
+        type: boolean
+    measures:
+      - name: revenue
+        sql: product_price
+        type: sum
+      - name: food_revenue
+        sql: "CASE WHEN ${CUBE}.is_food_item THEN ${CUBE}.product_price ELSE 0 END"
+        type: sum
+      - name: drink_revenue
+        sql: "CASE WHEN ${CUBE}.is_drink_item THEN ${CUBE}.product_price ELSE 0 END"
+        type: sum
+      - name: supply_cost
+        sql: supply_cost
+        type: sum
+      - name: item_count
+        type: count
+      - name: median_revenue
+        sql: product_price
+        type: avg
+    joins:
+      - name: orders
+        sql: "${CUBE}.order_id = ${orders.order_id}"
+        relationship: many_to_one
+      - name: products
+        sql: "${CUBE}.product_id = ${products.product_id}"
+        relationship: many_to_one

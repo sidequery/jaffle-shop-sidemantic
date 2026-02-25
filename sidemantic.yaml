@@ -1,0 +1,4 @@
+connection:
+  type: duckdb
+  path: jaffle_shop.duckdb
+models: models/
