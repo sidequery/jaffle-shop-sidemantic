@@ -10,19 +10,24 @@
     uv run setup.py
 """
 
-import subprocess
+import os
 from pathlib import Path
+from dbt.cli.main import dbtRunner
 
 PROJECT_DIR = Path(__file__).parent / "jaffle-shop"
-DBT_VARS = "{load_source_data: true}"
+os.chdir(PROJECT_DIR)
 
-for cmd in [
-    ["dbt", "deps"],
-    ["dbt", "seed", "--profiles-dir", ".", "--vars", DBT_VARS],
-    ["dbt", "build", "--profiles-dir", ".", "--vars", DBT_VARS],
+runner = dbtRunner()
+
+for args in [
+    ["deps"],
+    ["seed", "--profiles-dir", ".", "--vars", "{load_source_data: true}"],
+    ["build", "--profiles-dir", ".", "--vars", "{load_source_data: true}"],
 ]:
-    print(f"\nRunning: {' '.join(cmd)}")
-    subprocess.run(cmd, cwd=PROJECT_DIR, check=True)
+    print(f"\nRunning: dbt {' '.join(args)}")
+    res = runner.invoke(args)
+    if not res.success:
+        raise RuntimeError(f"dbt {args[0]} failed: {res.exception}")
 
-db = Path(__file__).parent / "jaffle_shop.duckdb"
+db = Path("../jaffle_shop.duckdb").resolve()
 print(f"\nDone. Built {db}")
